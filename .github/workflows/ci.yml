@@ -20,7 +20,7 @@ jobs:
           usesh: true
           prepare: |
             pkg refresh
-            pkg install gcc-15
+            pkg install gcc-14
           run: |
             uname -a
             gcc -v
