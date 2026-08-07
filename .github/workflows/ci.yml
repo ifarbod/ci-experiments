@@ -31,7 +31,7 @@ jobs:
             echo now clang
             echo | clang -E -dM -
             
-            gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello hello.cpp
-            clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 hello.cpp
+            gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello main.cpp
+            clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
             ./hello
             ./hell1
