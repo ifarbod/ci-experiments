@@ -34,4 +34,4 @@ jobs:
             gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello main.cpp
             clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
             ./hello
-            ./hell1
+            ./hello1
