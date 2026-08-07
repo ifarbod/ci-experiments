@@ -21,7 +21,7 @@ jobs:
           prepare: |
             pkg refresh
             pkg install gcc-14
-            pkg install clang-21
+            pkg install developer/clang-21
           run: |
             uname -a
             gcc -v
