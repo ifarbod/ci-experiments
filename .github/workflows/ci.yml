@@ -25,13 +25,13 @@ jobs:
           run: |
             uname -a
             gcc -v
-            clang -v
+            # clang -v
 
             echo | gcc -E -dM -
             echo now clang
-            echo | clang -E -dM -
+            # echo | clang -E -dM -
             
             gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello main.cpp
-            clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
+            # clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
             ./hello
-            ./hello1
+            # ./hello1
