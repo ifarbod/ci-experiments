@@ -1,0 +1,26 @@
+name: BSD & Unix Multi-Arch Build
+
+# on:
+#   push:
+#     branches: [ "master" ]
+#   pull_request:
+#     branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+# --- Solaris (OpenIndiana) ---
+  solaris:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Test on Solaris (x86_64)
+        uses: vmactions/openindiana-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg refresh
+            pkg install gcc-15
+          run: |
+            uname -a
+            gcc -v
