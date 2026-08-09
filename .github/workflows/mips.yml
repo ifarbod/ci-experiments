@@ -35,17 +35,16 @@ jobs:
   run-in-container:
     needs: cross-mips
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/alextwothousand/debian-mips64el:bookworm
 
     steps:
+      - name: Install node
+        run: |
+          apt-get update
+          apt-get install -y nodejs
+          
       - name: Download binary artifact
         uses: actions/download-artifact@v7
         with:
           name: mips-binary
-
-      - name: Set up QEMU for non-x86 container execution
-        uses: docker/setup-qemu-action@v3
-
-      - name: Make executable and run inside container
-        run: |
-          chmod +x ./hello
-          docker run --rm -v "$PWD":/work -w /work ghcr.io/alextwothousand/debian-mips64el:bookworm ./hello
