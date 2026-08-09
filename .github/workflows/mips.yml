@@ -1,17 +1,13 @@
 name: MIPS
 
 on:
-#   push:
-#     branches: [ "master" ]
-#   pull_request:
-#     branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
   cross-mips:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
 
       - name: Install g++-16 mips64el cross-compiler via isolated deb extraction
         run: |
@@ -24,13 +20,15 @@ jobs:
           curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
           echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
-          # 3. Download the exact cross-compiler packages and dependencies from Debian Sid
+          # 3. Download cross-compiler packages and required binutils shared libraries
           sudo apt-get update
           apt-get download \
             g++-16-mips64el-linux-gnuabi64 \
             gcc-16-mips64el-linux-gnuabi64 \
             cpp-16-mips64el-linux-gnuabi64 \
             binutils-mips64el-linux-gnuabi64 \
+            binutils-mips64el-linux-gnuabi64-libs \
+            libbinutils \
             gcc-16-mips64el-linux-gnuabi64-base \
             gcc-16-cross-base-mipsen \
             libgcc-16-dev-mips64el-cross \
@@ -42,19 +40,21 @@ jobs:
             libatomic1-mips64el-cross \
             linux-libc-dev-mips64el-cross \
             libcc1-0 \
-            libsframe3
+            libsframe1 \
+            libsframe3 || true
 
           # 4. Remove Sid source list so APT stays pristine
           sudo rm /etc/apt/sources.list.d/debian-sid.list
           sudo apt-get update
 
-          # 5. Unpack all .deb archives directly into /opt/gcc-16-mips64el without invoking dpkg/apt
+          # 5. Unpack all .deb archives directly into /opt/gcc-16-mips64el
           for deb in *.deb; do
             dpkg-deb -x "$deb" /opt/gcc-16-mips64el
           done
 
-          # 6. Add bin directory to PATH for subsequent steps in GitHub Actions
+          # 6. Export runtime library paths and PATH for subsequent steps
           echo "/opt/gcc-16-mips64el/usr/bin" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=/opt/gcc-16-mips64el/usr/lib/x86_64-linux-gnu:/opt/gcc-16-mips64el/usr/lib:\$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
       - name: Verify GCC version
         run: |
