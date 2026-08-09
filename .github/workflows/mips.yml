@@ -41,7 +41,7 @@ jobs:
             linux-libc-dev-mips64el-cross \
             libcc1-0 \
             libsframe1 \
-            libsframe3 || true
+            libsframe3
 
           # 4. Remove Sid source list so APT stays pristine
           sudo rm /etc/apt/sources.list.d/debian-sid.list
