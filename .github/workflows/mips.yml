@@ -35,8 +35,6 @@ jobs:
   run-in-container:
     needs: cross-mips
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/alextwothousand/debian-mips64el:bookworm
 
     steps:
       - name: Download binary artifact
@@ -44,7 +42,7 @@ jobs:
         with:
           name: mips-binary
 
-      - name: Make executable and run
+      - name: Make executable and run inside container
         run: |
           chmod +x ./hello
-          ./hello
+          docker run --rm -v "$PWD":/work -w /work ghcr.io/alextwothousand/debian-mips64el:bookworm ./hello
