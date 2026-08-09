@@ -6,63 +6,25 @@ on:
 jobs:
   cross-mips:
     runs-on: ubuntu-latest
+    container:
+      image: debian:sid
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - name: Install g++-16 mips64el cross-compiler via isolated deb extraction
+      - name: Install cross-compiler
         run: |
-          # 1. Create temporary directory for downloads and install directory in /opt
-          mkdir -p /tmp/debs /opt/gcc-16-mips64el
-          cd /tmp/debs
+          apt-get update
+          apt-get install -y g++-16-mips64el-linux-gnuabi64
 
-          # 2. Add Debian Sid repository temporarily to download debs
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
-          echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
-
-          # 3. Download cross-compiler packages and required binutils shared libraries
-          sudo apt-get update
-          apt-get download \
-            g++-16-mips64el-linux-gnuabi64 \
-            gcc-16-mips64el-linux-gnuabi64 \
-            cpp-16-mips64el-linux-gnuabi64 \
-            binutils-mips64el-linux-gnuabi64 \
-            binutils-mips64el-linux-gnuabi64-libs \
-            libbinutils \
-            gcc-16-mips64el-linux-gnuabi64-base \
-            gcc-16-cross-base-mipsen \
-            libgcc-16-dev-mips64el-cross \
-            libstdc++-16-dev-mips64el-cross \
-            libstdc++6-mips64el-cross \
-            libc6-dev-mips64el-cross \
-            libc6-mips64el-cross \
-            libgomp1-mips64el-cross \
-            libatomic1-mips64el-cross \
-            linux-libc-dev-mips64el-cross \
-            libcc1-0 \
-            libsframe1 \
-            libsframe3
-
-          # 4. Remove Sid source list so APT stays pristine
-          sudo rm /etc/apt/sources.list.d/debian-sid.list
-          sudo apt-get update
-
-          # 5. Unpack all .deb archives directly into /opt/gcc-16-mips64el
-          for deb in *.deb; do
-            dpkg-deb -x "$deb" /opt/gcc-16-mips64el
-          done
-
-          # 6. Export runtime library paths and PATH for subsequent steps
-          echo "/opt/gcc-16-mips64el/usr/bin" >> $GITHUB_PATH
-          echo "LD_LIBRARY_PATH=/opt/gcc-16-mips64el/usr/lib/x86_64-linux-gnu:/opt/gcc-16-mips64el/usr/lib:\$LD_LIBRARY_PATH" >> $GITHUB_ENV
-
-      - name: Verify GCC version
+      - name: Compile code
         run: |
-          mips64el-linux-gnuabi64-g++-16 -v
-
-      - name: Compile code with GCC
-        run: |
-          mips64el-linux-gnuabi64-g++-16 -v -O2 -Wall -Wextra -Wpedantic -ffreestanding -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit -fno-stack-protector -fno-pic -fno-pie -fno-unwind-tables -fno-asynchronous-unwind-tables -nostdlib -nostartfiles -nodefaultlibs -static -no-pie -Wl,-e,_start -Wl,--build-id=none hello.cpp -o hello
+          mips64el-linux-gnuabi64-g++-16 -v -O2 -Wall -Wextra -Wpedantic \
+            -ffreestanding -fno-exceptions -fno-rtti -fno-threadsafe-statics \
+            -fno-use-cxa-atexit -fno-stack-protector -fno-pic -fno-pie \
+            -fno-unwind-tables -fno-asynchronous-unwind-tables -nostdlib \
+            -nostartfiles -nodefaultlibs -static -no-pie -Wl,-e,_start \
+            -Wl,--build-id=none hello.cpp -o hello
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v7
