@@ -13,36 +13,42 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Add Debian Sid sources and install g++-16 cross-compiler
+      - name: Download and install g++-16 mips64el cross-compiler directly
         run: |
-          # 1. Download official Debian archive keyring
+          # 1. Create a workspace directory for debs
+          mkdir -p /tmp/debs && cd /tmp/debs
+
+          # 2. Add Debian Sid repository temporarily to download packages without upgrading host system
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
-
-          # 2. Add Debian Sid repository
           echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
-          # 3. Configure strict Apt Pinning to protect core host system packages
-          sudo tee /etc/apt/preferences.d/debian-sid-pin > /dev/null << 'EOF'
-          # Prevent Debian from taking over critical host system utilities
-          Package: base-files dpkg dpkg-dev libc6 libc6-dev libc-bin locales make binutils binutils-x86-64-linux-gnu
-          Pin: release o=Ubuntu
-          Pin-Priority: 1001
-
-          # Default priority for all other Sid packages
-          Package: *
-          Pin: release o=Debian,a=unstable
-          Pin-Priority: 100
-
-          # Allow the specific MIPS compiler and cross-libs from Sid
-          Package: *mips64el-linux-gnuabi64* *mips64el-cross gcc-16* cpp-16* libcc1-0
-          Pin: release o=Debian,a=unstable
-          Pin-Priority: 990
-          EOF
-
-          # 4. Update apt index and install the cross-compiler
+          # 3. Update apt index and fetch all required .deb packages
           sudo apt-get update
-          sudo apt-get install -y g++-16-mips64el-linux-gnuabi64
+          apt-get download \
+            g++-16-mips64el-linux-gnuabi64 \
+            gcc-16-mips64el-linux-gnuabi64 \
+            cpp-16-mips64el-linux-gnuabi64 \
+            binutils-mips64el-linux-gnuabi64 \
+            gcc-16-mips64el-linux-gnuabi64-base \
+            gcc-16-cross-base-mipsen \
+            libgcc-16-dev-mips64el-cross \
+            libstdc++-16-dev-mips64el-cross \
+            libstdc++6-mips64el-cross \
+            libc6-dev-mips64el-cross \
+            libc6-mips64el-cross \
+            libgomp1-mips64el-cross \
+            libatomic1-mips64el-cross \
+            linux-libc-dev-mips64el-cross \
+            libcc1-0
+
+          # 4. Clean up Sid sources to prevent system corruption
+          sudo rm /etc/apt/sources.list.d/debian-sid.list
+          sudo apt-get update
+
+          # 5. Install downloaded deb files, forcing dependencies over host conflicts
+          sudo dpkg -i --force-depends *.deb || true
+          sudo apt-get install -f -y
 
       - name: Verify GCC version
         run: |
