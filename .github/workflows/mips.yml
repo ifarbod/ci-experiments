@@ -13,17 +13,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Download and install g++-16 mips64el cross-compiler directly
+      - name: Install g++-16 mips64el cross-compiler via isolated deb extraction
         run: |
-          # 1. Create a workspace directory for debs
-          mkdir -p /tmp/debs && cd /tmp/debs
+          # 1. Create temporary directory for downloads and install directory in /opt
+          mkdir -p /tmp/debs /opt/gcc-16-mips64el
+          cd /tmp/debs
 
-          # 2. Add Debian Sid repository temporarily to download packages without upgrading host system
+          # 2. Add Debian Sid repository temporarily to download debs
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
           echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
-          # 3. Update apt index and fetch all required .deb packages
+          # 3. Download the exact cross-compiler packages and dependencies from Debian Sid
           sudo apt-get update
           apt-get download \
             g++-16-mips64el-linux-gnuabi64 \
@@ -40,15 +41,20 @@ jobs:
             libgomp1-mips64el-cross \
             libatomic1-mips64el-cross \
             linux-libc-dev-mips64el-cross \
-            libcc1-0
+            libcc1-0 \
+            libsframe3
 
-          # 4. Clean up Sid sources to prevent system corruption
+          # 4. Remove Sid source list so APT stays pristine
           sudo rm /etc/apt/sources.list.d/debian-sid.list
           sudo apt-get update
 
-          # 5. Install downloaded deb files, forcing dependencies over host conflicts
-          sudo dpkg -i --force-depends *.deb || true
-          sudo apt-get install -f -y
+          # 5. Unpack all .deb archives directly into /opt/gcc-16-mips64el without invoking dpkg/apt
+          for deb in *.deb; do
+            dpkg-deb -x "$deb" /opt/gcc-16-mips64el
+          done
+
+          # 6. Add bin directory to PATH for subsequent steps in GitHub Actions
+          echo "/opt/gcc-16-mips64el/usr/bin" >> $GITHUB_PATH
 
       - name: Verify GCC version
         run: |
