@@ -59,3 +59,30 @@ jobs:
       - name: Verify GCC version
         run: |
           mips64el-linux-gnuabi64-g++-16 -v
+
+      - name: Compile code with GCC
+        run: |
+          mips64el-linux-gnuabi64-g++-16 -v hello.cpp -o hello
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: mips-binary
+          path: hello
+
+  run-in-container:
+    needs: cross-mips
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/alextwothousand/debian-mips64el:bookworm
+
+    steps:
+      - name: Download binary artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: mips-binary
+
+      - name: Make executable and run
+        run: |
+          chmod +x ./hello
+          ./hello
