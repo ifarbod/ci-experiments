@@ -1,0 +1,44 @@
+name: BSD & Unix Multi-Arch Build
+
+on:
+#   push:
+#     branches: [ "master" ]
+#   pull_request:
+#     branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  cross-mips:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Add Debian Sid sources and install g++-16 cross-compiler
+        run: |
+          # 1. Add Debian Sid repository
+          echo "deb http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
+
+          # 2. Configure Apt Pinning to prevent Debian Sid from upgrading system packages
+          sudo tee /etc/apt/preferences.d/debian-sid-pin > /dev/null << 'EOF'
+          Package: *
+          Pin: release o=Debian,a=unstable
+          Pin-Priority: 100
+
+          Package: *mips64el-linux-gnuabi64*
+          Pin: release o=Debian,a=unstable
+          Pin-Priority: 990
+          EOF
+
+          # 3. Import Debian keyring to verify packages
+          sudo apt-get update || true
+          sudo apt-get install -y debian-archive-keyring
+
+          # 4. Update apt index with keys installed
+          sudo apt-get update
+
+          # 5. Install the specific cross-compiler package
+          sudo apt-get install -y g++-16-mips64el-linux-gnuabi64
+
+      - name: Verify GCC version
+        run: |
+          mips64el-linux-gnuabi64-g++-16 -v
