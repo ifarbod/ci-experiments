@@ -41,10 +41,12 @@ jobs:
     steps:
       - name: Install node
         run: |
-          apt-get update
-          apt-get install -y nodejs
+          apt-get update && apt-get install -y nodejs
           
       - name: Download binary artifact
         uses: actions/download-artifact@v7
         with:
           name: mips-binary
+      - name: Run
+        run: chmox +x hello && ./hello
+        
