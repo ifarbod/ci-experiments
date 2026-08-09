@@ -15,13 +15,12 @@ jobs:
 
       - name: Add Debian Sid sources and install g++-16 cross-compiler
         run: |
-          # 1. Fetch missing Debian archive GPG keys directly into APT trusted keys
-          sudo gpg --no-default-keyring --keyring /etc/apt/trusted.gpg.d/debian-official-archive-keyring.gpg \
-            --keyserver keyserver.ubuntu.com \
-            --recv-keys 6ED0E7B82643E131 78DBA3BC47EF2265
+          # 1. Download official Debian archive key file directly over HTTPS
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
 
-          # 2. Add Debian Sid repository
-          echo "deb http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
+          # 2. Add Debian Sid repository referencing the key directly
+          echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
           # 3. Configure Apt Pinning to prevent Debian Sid from upgrading Ubuntu system packages
           sudo tee /etc/apt/preferences.d/debian-sid-pin > /dev/null << 'EOF'
