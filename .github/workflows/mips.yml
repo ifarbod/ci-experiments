@@ -62,7 +62,7 @@ jobs:
 
       - name: Compile code with GCC
         run: |
-          mips64el-linux-gnuabi64-g++-16 -v hello.cpp -o hello
+          mips64el-linux-gnuabi64-g++-16 -v -O2 -Wall -Wextra -Wpedantic -ffreestanding -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit -fno-stack-protector -fno-pic -fno-pie -fno-unwind-tables -fno-asynchronous-unwind-tables -nostdlib -nostartfiles -nodefaultlibs -static -no-pie -Wl,-e,_start -Wl,--build-id=none hello.cpp -o hello
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v7
