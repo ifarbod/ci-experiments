@@ -22,20 +22,27 @@ jobs:
           # 2. Add Debian Sid repository
           echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
-          # 3. Configure Apt Pinning to allow cross-compiler and GCC 16 dependencies from Sid
+          # 3. Configure strict Apt Pinning to protect core host system packages
           sudo tee /etc/apt/preferences.d/debian-sid-pin > /dev/null << 'EOF'
+          # Prevent Debian from taking over critical host system utilities
+          Package: base-files dpkg dpkg-dev libc6 libc6-dev libc-bin locales make binutils binutils-x86-64-linux-gnu
+          Pin: release o=Ubuntu
+          Pin-Priority: 1001
+
+          # Default priority for all other Sid packages
           Package: *
           Pin: release o=Debian,a=unstable
           Pin-Priority: 100
 
-          Package: *mips64el-linux-gnuabi64* libgcc-16-dev-mips64el-cross libstdc++-16-dev-mips64el-cross libstdc++6-mips64el-cross gcc-16-base libcc1-0
+          # Allow the specific MIPS compiler and cross-libs from Sid
+          Package: *mips64el-linux-gnuabi64* *mips64el-cross gcc-16* cpp-16* libcc1-0
           Pin: release o=Debian,a=unstable
           Pin-Priority: 990
           EOF
 
-          # 4. Update apt index and install the cross-compiler specifying the target release
+          # 4. Update apt index and install the cross-compiler
           sudo apt-get update
-          sudo apt-get install -y -t sid g++-16-mips64el-linux-gnuabi64
+          sudo apt-get install -y g++-16-mips64el-linux-gnuabi64
 
       - name: Verify GCC version
         run: |
