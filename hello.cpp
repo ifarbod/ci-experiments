@@ -123,7 +123,7 @@ static long sys_write(int fd, const void* buf, unsigned long count)
     return v0;
 }
 
-static [[noreturn]] void sys_exit(int code)
+static void sys_exit(int code)
 {
     register long v0 __asm__("$2") = 5058;
     register long a0 __asm__("$4") = (long)code;
