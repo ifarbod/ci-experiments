@@ -15,27 +15,27 @@ jobs:
 
       - name: Add Debian Sid sources and install g++-16 cross-compiler
         run: |
-          # 1. Download official Debian archive key file directly over HTTPS
+          # 1. Download official Debian archive keyring
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://ftp-master.debian.org/keys/archive-key-12.asc | sudo gpg --dearmor -o /etc/apt/keyrings/debian-archive-keyring.gpg
 
-          # 2. Add Debian Sid repository referencing the key directly
+          # 2. Add Debian Sid repository
           echo "deb [signed-by=/etc/apt/keyrings/debian-archive-keyring.gpg] http://deb.debian.org/debian sid main" | sudo tee /etc/apt/sources.list.d/debian-sid.list
 
-          # 3. Configure Apt Pinning to prevent Debian Sid from upgrading Ubuntu system packages
+          # 3. Configure Apt Pinning to allow cross-compiler and GCC 16 dependencies from Sid
           sudo tee /etc/apt/preferences.d/debian-sid-pin > /dev/null << 'EOF'
           Package: *
           Pin: release o=Debian,a=unstable
           Pin-Priority: 100
 
-          Package: *mips64el-linux-gnuabi64*
+          Package: *mips64el-linux-gnuabi64* libgcc-16-dev-mips64el-cross libstdc++-16-dev-mips64el-cross libstdc++6-mips64el-cross gcc-16-base libcc1-0
           Pin: release o=Debian,a=unstable
           Pin-Priority: 990
           EOF
 
-          # 4. Update apt index and install the cross-compiler
+          # 4. Update apt index and install the cross-compiler specifying the target release
           sudo apt-get update
-          sudo apt-get install -y g++-16-mips64el-linux-gnuabi64
+          sudo apt-get install -y -t sid g++-16-mips64el-linux-gnuabi64
 
       - name: Verify GCC version
         run: |
