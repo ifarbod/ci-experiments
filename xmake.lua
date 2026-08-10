@@ -4,6 +4,8 @@ add_rules("mode.debug", "mode.release")
 set_policy("build.c++.modules", true)
 set_policy("build.c++.modules.std", false)
 
+set_policy("build.c++.modules.hide_dependencies", true)
+
 target("cpp20_modules_app")
     set_kind("binary")
     set_languages("cxx26")
