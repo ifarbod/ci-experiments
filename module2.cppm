@@ -1,5 +1,11 @@
-export module module2;
+export module mods:module2;
 
-export int get_module2_value() {
-    return 2;
+export namespace mods
+{
+
+int get_module2_value()
+{
+    return 37;
+}
+
 }
