@@ -13,5 +13,5 @@ target("cpp20_modules_app")
     -- Disable RTTI and Exceptions
     add_cxxflags("-fno-rtti", "-fno-exceptions")
 
-    add_files("module.cpp")
+    add_files("module.cpp", {cxxflags = {"-fcxx-modules", "-fmodules"}})
     add_files("*.cppm", {cxxflags = {"-fcxx-modules", "-fmodules"}})
