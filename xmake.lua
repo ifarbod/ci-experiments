@@ -10,7 +10,7 @@ target("cpp20_modules_app")
     set_kind("binary")
     set_languages("cxx26")
 
-    on_load(function (target)
+    on_config(function (target)
         local cc = target:tool("cc") or "clang"
         local ok, outdata = os.iorunv(cc, {"--version"})
         if ok and outdata and outdata:find("Apple clang", 1, true) then
@@ -18,6 +18,13 @@ target("cpp20_modules_app")
             target:set("policy", "build.c++.modules.clang.fallbackscanner", true)
         end
     end)
+
+    -- on_config(function (target)
+    --     local cc = target:tool("cc")
+    --     if cc and cc:find("Xcode.app", 1, true) then
+    --         target:set("policy", "build.c++.modules.clang.fallbackscanner", true)
+    --     end
+    -- end)
 
     -- Disable RTTI and Exceptions
     add_cxxflags("-fno-rtti", "-fno-exceptions")
