@@ -5,10 +5,9 @@ set_policy("build.c++.modules.std", false)
 
 target("cpp20_modules_app")
     set_kind("binary")
-    set_languages("c++20")
+    set_languages("cxx26")
 
     -- Disable RTTI and Exceptions
-    add_rflags("-fno-rtti", "-fno-exceptions")
     add_cxxflags("-fno-rtti", "-fno-exceptions")
 
     -- Source files
