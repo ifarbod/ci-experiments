@@ -28,4 +28,10 @@ jobs:
         xmake-version: latest
 
     - name: Build Project
-      run: xmake -v
+      run: |
+        xmake f -c -p iphoneos
+        xmake -rv
+        
+        xmake f -c
+        xmake -rv
+
