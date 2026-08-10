@@ -1,6 +1,7 @@
 add_rules("mode.debug", "mode.release")
 
 -- Disable C++ standard library modules build policy
+set_policy("build.c++.modules", true)
 set_policy("build.c++.modules.std", false)
 
 target("cpp20_modules_app")
