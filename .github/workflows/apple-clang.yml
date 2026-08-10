@@ -35,3 +35,6 @@ jobs:
         xmake f -c
         xmake -rv
 
+        xmake run
+
+
