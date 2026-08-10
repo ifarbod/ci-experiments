@@ -16,6 +16,7 @@ target("cpp20_modules_app")
         if ok and outdata and outdata:find("Apple clang", 1, true) then
             -- xcode doesn't ship clang-scan-deps sadly
             target:set("policy", "build.c++.modules.clang.fallbackscanner", true)
+            print("using fallback xmake scanner")
         end
     end)
 
@@ -23,6 +24,7 @@ target("cpp20_modules_app")
     --     local cc = target:tool("cc")
     --     if cc and cc:find("Xcode.app", 1, true) then
     --         target:set("policy", "build.c++.modules.clang.fallbackscanner", true)
+    --         print("using fallback xmake scanner, second method")
     --     end
     -- end)
 
