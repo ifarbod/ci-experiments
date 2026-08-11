@@ -14,4 +14,4 @@ target("cpp20_modules_app")
     add_cxxflags("-fcxx-modules") -- needed for xcode clang only
 
     add_files("*.cpp")
-    -- add_files("*.cppm")
+    add_files("*.cppm")
