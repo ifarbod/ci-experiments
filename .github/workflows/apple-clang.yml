@@ -20,9 +20,8 @@ jobs:
       run: |
         uname -a
         sw_vers
-        ls -la /usr/bin/clang
+        ls -la /Library/Developer/CommandLineTools/usr/bin/
         echo meow
-        which -a clang
         clang -v
 
     - name: Install Xmake
