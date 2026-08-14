@@ -20,7 +20,9 @@ jobs:
       run: |
         uname -a
         sw_vers
-        mdfind 'kMDItemFSName == "clang"c'
+        ls -la /usr/bin/clang
+        echo meow
+        which -a clang
         clang -v
 
     - name: Install Xmake
