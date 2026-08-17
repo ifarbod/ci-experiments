@@ -23,6 +23,8 @@ jobs:
         ls -la /Library/Developer/CommandLineTools/usr/bin/
         echo meow
         clang -v
+        chmod +x ib_app
+        ./ib_app
 
     - name: Install Xmake
       uses: xmake-io/github-action-setup-xmake@v1
