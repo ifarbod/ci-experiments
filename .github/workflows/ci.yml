@@ -20,18 +20,18 @@ jobs:
           usesh: true
           prepare: |
             pkg refresh
-            pkg install gcc-14
-            # pkg install developer/clang-21
+            # pkg install gcc-14
+            pkg install developer/clang-21
           run: |
             uname -a
-            gcc -v
-            # clang -v
+            # gcc -v
+            clang -v
 
-            echo | gcc -E -dM -
+            # echo | gcc -E -dM -
             echo now clang
-            # echo | clang -E -dM -
+            echo | clang -E -dM -
             
-            gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello main.cpp
-            # clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
-            ./hello
-            # ./hello1
+            # gcc -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello main.cpp
+            clang -m64 -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -nostartfiles -static -o hello1 main.cpp
+            # ./hello
+            ./hello1
